@@ -1,0 +1,175 @@
+//Purpose: Use Google Form to create new JumpCloud User, create helpDesk ticket, and send emails to interested parties
+//Applications Used: Google Form, Google Sheets, Google Apps Script/Google API Developer Hub, JumpCloud API Documenatation
+//How:
+//1)Create Google Form
+//2)Open Google Sheet automatically created for Google Form responses
+//3)Using Google Sheet 'Tools', open Script editor
+//4)Paste following and edit to your needs:
+
+function newHireTicket() 
+{
+  Utilities.sleep(6000)
+  
+  //*************************************************************************FormVariables****************************************************************************
+  //variable for email 'to' field
+  var to1 = "helpdesk@yourDomainHere.com";
+  //variable for email 'cc' field. would prefer this to be an email group and not individuals
+  var cc1 = "hrGroup@yourDomainHere.com, facilitiesGroup@yourDomainHere.com";
+  //variable for spreadsheet ID collecting form responses
+  var spreadSheet = SpreadsheetApp.openById("The Spreadsheet ID");
+  //variable for actual Google Sheet name and not the workbook name
+  var activeSpreadsheet = spreadSheet.getSheetByName('Google Sheet Name');
+  //variable that directs script to start with the last row in the spreadsheet
+  var lastRow = activeSpreadsheet.getLastRow();
+  //NOTE:
+  //Spreadsheet column numbers will vary...depending on things you track and in what order you track them
+  //For instance: 'startDate' happens to be the second column in our worksheet. 
+  //If it was the fourth column, the values would be (lastRow,4,1,1)
+  var startDate = activeSpreadsheet.getSheetValues(lastRow,2,1,1).toString();
+  //split start date into array and print only month, day, and year
+  var spaceIndex0 = startDate.indexOf(' ');
+  if(spaceIndex0!=0)
+  {
+    var startArray = startDate.split(' ');
+    var orientationDate = startArray[0]+" "+startArray[1]+" "+startArray[2]+" "+startArray[3];
+  }
+  //remove any spaces and hyphens from first name
+  var firstName = activeSpreadsheet.getSheetValues(lastRow,3,1,1).toString();
+  var spaceIndex5 = firstName.indexOf(' ');
+  if(spaceIndex5!=0)
+  {
+    var firstNameClean = firstName.replace(/-|\s/g,"");
+  }
+  //remove any spaces and hyphens from last name
+  var lastName = activeSpreadsheet.getSheetValues(lastRow,4,1,1).toString();
+  var spaceIndex4 = lastName.indexOf(' ');
+  if(spaceIndex4!=0)
+  {
+    var lastNameClean = lastName.replace(/-|\s/g,"");
+  }
+  var prefferredName = activeSpreadsheet.getSheetValues(lastRow,5,1,1).toString();
+  var spaceIndex6 = prefferredName.indexOf(' ');
+  if(spaceIndex6!=0)
+  {
+    //remove any spaces and hyphens from prefferred name
+    var prefferredNameClean = prefferredName.replace(/-|\s/g,"");
+  }
+  //if new hire has a preferred name, use the preferred name, otherwise use first name
+  if(prefferredNameClean != '' && prefferredNameClean != ' ')
+  {
+    var jumpCloudDisplay = prefferredName + " " + lastName;
+    var jumpCloudUserEmail = prefferredNameClean.toLowerCase() + lastNameClean.toLowerCase() +"@yourDomainHere";
+    var jumpCloudUserName = prefferredNameClean.toLowerCase() + lastNameClean.toLowerCase();
+  } 
+  else 
+  {
+    jumpCloudDisplay = firstName + " " + lastName;
+    jumpCloudUserEmail = firstNameClean.toLowerCase() + lastNameClean.toLowerCase() +"@yourDomainHere";
+    jumpCloudUserName = firstNameClean.toLowerCase() + lastNameClean.toLowerCase();
+  }
+  //variable for new hire title
+  var title = activeSpreadsheet.getSheetValues(lastRow,6,1,1).toString();
+  //variable for new hire lead
+  var leadName = activeSpreadsheet.getSheetValues(lastRow,7,1,1).toString();
+  var spaceIndex3 = leadName.indexOf(' ');
+  if(spaceIndex3!=0)
+  {
+    //take lead name, remove comma and space, split into array, and combine into lead email
+    var leadNameArray = leadName.split(', ');
+    var lead = leadNameArray[1] +leadNameArray[0]
+    var leadEmail = leadNameArray[1] +leadNameArray[0] +"@yourDomainHere.com";
+  }
+  var ccArray = cc1+","+leadEmail;
+  //variable for new hire location
+  var location = activeSpreadsheet.getSheetValues(lastRow,8,1,1).toString();
+  //variable for new hire department
+  var department = activeSpreadsheet.getSheetValues(lastRow,9,1,1).toString();
+  //variable for new hire mobile phone number
+  var contactNumber = activeSpreadsheet.getSheetValues(lastRow,10,1,1).toString();
+  //variable for new hire laptop os
+  var operatingSystem = activeSpreadsheet.getSheetValues(lastRow,11,1,1).toString();
+  //variable for new hire laptop RAM
+  var laptopMemory = activeSpreadsheet.getSheetValues(lastRow,12,1,1).toString();
+  //variable for new hire desk assignment
+  var deskAssignment = activeSpreadsheet.getSheetValues(lastRow,13,1,1).toString();
+  //variable for new hire transportation type
+  var transportation = activeSpreadsheet.getSheetValues(lastRow,14,1,1).toString();
+  //variable for new hire building card type
+  var buildingCard = activeSpreadsheet.getSheetValues(lastRow,15,1,1).toString();
+  //variable for hr notes about new hire
+  var notes = activeSpreadsheet.getSheetValues(lastRow,17,1,1).toString();
+  //variable for company logo
+  var fileId = 'logoID';
+  var yourDomainHereHeaderBlob = DriveApp.getFileById(fileId).getBlob();
+ 
+  //*************************************************************************HelpDeskEmail****************************************************************************
+  //Self Explanatory
+  MailApp.sendEmail({
+    to: to1.toLowerCase(),
+    cc: ccArray.toLowerCase(),
+    subject: "New Hire Ticket: "+jumpCloudDisplay+" "+orientationDate,
+    htmlBody: "<center><img src='cid:yourDomainHereHeader'><br /></center>"+    
+    "<center><b><h2>  New Hire Ticket</h2></b><br /></center>"+
+    "<hr></hr>" +
+    "<p><h3>New Hire "+jumpCloudDisplay+" will start on "+orientationDate+"</h3></p>"+
+    "<hr></hr>" +
+    "<b><h4>  New Hire Information</h4></b>"+
+    "<p><b>Start Date:       </b>"+orientationDate+"</p>"+
+    "<p><b>Location:         </b>"+location+"</p>"+
+    "<p><b>Employee Name:    </b>"+jumpCloudDisplay+"</p>"+
+    "<p><b>Employee Title:   </b>"+title+"</p>"+
+    "<p><b>Employee Email:   </b>"+jumpCloudUserEmail+"</p>"+
+    "<p><b>Employee Contact: </b>"+contactNumber+"</p>"+
+    "<p><b>Lead:             </b>"+lead+"</p>"+
+    "<p><b>Lead Email:       </b>"+leadEmail+"</p>"+
+    "<p><b>Department:       </b>"+department+"</p>"+
+    "<p><b>Notes:            </b>"+notes+"</p>"+
+    "<hr></hr>" +
+    "<b><h4>Facilities</h4></b>"+
+    "<p><b>Location:         </b>"+location+"</p>"+
+    "<p><b>Desk Assignment:  </b>"+deskAssignment+"</p>"+
+    "<p><b>Transportation:   </b>"+transportation+"</p>"+
+    "<p><b>Building Card:    </b>"+buildingCard+"</p>"+
+    "<hr></hr>" +
+    "<b><h4>Laptop</h4></b>"+
+    "<p><b>Operation Sys:    </b>"+operatingSystem+"</p>"+
+    "<p><b>Laptop Type:      </b>"+laptopMemory+"</p>",
+
+   inlineImages:
+   {yourDomainHereHeader:yourDomainHereHeaderBlob}});
+  
+  //*************************************************************************JumpCloudNewUser****************************************************************************
+  //Using JumpCloud (JC) API Documentation version 1
+  //variable for JC API system users to create a new user
+  var url = 'https://console.jumpcloud.com/api/systemusers';
+  //variable for desired information to be included in the new user profile
+  //Required: username & email 
+  //Optional: first name, middle name, last name, display name, description, all employment information, and all personal employee information
+  //Note: syntax of arrays is very important. Ex: phoneNumbers, which caused us quite a bit of issues
+  var data = {
+	   "username": jumpCloudUserName,
+	   "email": jumpCloudUserEmail,
+	   "firstname": firstName,
+	   "lastname": lastName,
+       "displayname": jumpCloudDisplay,
+       "department": department,
+       "location": location,
+       "phoneNumbers":[{
+          "type": "mobile",
+          "number": contactNumber
+       }]
+  };
+  //variable for required API POST information
+  //Note: all of these are required for a succesful creation of a new user
+  var options = {
+    "headers" : {"x-api-key": "your API Key Here"},
+    "contentType":"application/json",
+    "method" : "POST",
+    "payload" : JSON.stringify(data)
+  };
+  
+  var response = UrlFetchApp.fetch(url,options);
+  Logger.log(JSON.stringify(response));
+  return response.getContentText();
+
+}
