@@ -1,0 +1,13 @@
+##Last Updated 4/28/2020
+##Below is the install script in JumpCloud Command "Install Slack - Windows"
+##MSI installer too big to upload to JC
+##Must download slack MSI file first and then install
+
+##Notes for future installs:
+##https://downloads.slack-edge.com/releases_x64/slack-standalone-4.5.0.0.msi. 
+##Each time we release an update, a link to the latest version is published in this RSS feed: https://slack.com/release-notes/windows/rss
+
+##Install Slack for all users on device
+##Missing switches to install shortcut or on taskbars
+
+$Installer = "$env:temp\slack-standalone-4.5.0.0.msi"; Invoke-WebRequest "https://downloads.slack-edge.com/releases_x64/slack-standalone-4.5.0.0.msi" -OutFile $Installer; Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Windows\Temp\slack-standalone-4.5.0.0.msi /quiet'
