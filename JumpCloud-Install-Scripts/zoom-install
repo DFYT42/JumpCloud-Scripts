@@ -1,0 +1,11 @@
+##Last Updated 4/28/2020
+##Below is the install script in JumpCloud Command "Install Zoom - Windows"
+##MSI installer too big to upload to JC
+##Must download zoom MSI file first and then install
+
+##Installs Zoom for all users on device
+##Missing switches to install shortcut or on taskbars
+
+
+
+$Installer = "$env:temp\ZoomInstallerFull.msi"; Invoke-WebRequest "http://zoom.us/client/latest/ZoomInstallerFull.msi" -OutFile $Installer; Start-Process msiexec.exe -Wait -ArgumentList '/I C:\Windows\Temp\ZoomInstallerFull.msi /quiet'
