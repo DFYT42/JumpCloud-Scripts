@@ -1,0 +1,14 @@
+##Last Updated: 4/28/2020
+##Below is the install script in JumpCloud Command "Install Adobe - Windows"
+##Exe installer too big to upload to JC
+##Must download adobe exe file first and then install
+
+##Notes for future installs:
+##ftp://ftp.adobe.com/pub/adobe/reader/win/AcrobatDC/ 
+##Will need to copy and paste newest file folder and exact file name needed for newest install
+
+##Install Adobe for all users
+##Missing switches to install shortcut or on taskbars
+
+
+$Path = $env:TEMP; $Installer = "AcroRdrDC2000620042_en_US.exe"; Invoke-WebRequest "ftp://ftp.adobe.com/pub/adobe/reader/win/AcrobatDC/2000620042/AcroRdrDC2000620042_en_US.exe" -OutFile $Path\$Installer; Start-Process -FilePath $Path\$Installer -Args "/silent /install" -Verb RunAs -Wait; Remove-Item $Path\$Installer
