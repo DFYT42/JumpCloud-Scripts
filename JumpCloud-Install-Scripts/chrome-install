@@ -1,0 +1,9 @@
+##Last Updated: 4/28/2020
+##Below is the install script in JumpCloud Command "Install Chrome - Windows"
+##Exe installer too big to upload to JC
+##Must download Chrome exe file first and then install
+
+##Install Chrome for all users
+##Missing switches to install shortcut or on taskbars
+
+$Path = $env:TEMP; $Installer = "chrome_installer.exe"; Invoke-WebRequest "http://dl.google.com/chrome/install/375.126/chrome_installer.exe" -OutFile $Path\$Installer; Start-Process -FilePath $Path\$Installer -Args "/silent /install" -Verb RunAs -Wait; Remove-Item $Path\$Installer
